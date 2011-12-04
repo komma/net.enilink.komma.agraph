@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KOMMA Allegrograph provider
+Bundle-SymbolicName: net.enilink.komma.agraph;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: lib/agraph-4.4.jar,
+ lib/commons-pool-1.5.6.jar,
+ lib/json.jar,
+ .
+Import-Package: com.google.inject;version="3.0.0",
+ com.google.inject.binder;version="3.0.0",
+ com.google.inject.util;version="3.0.0",
+ org.eclipse.core.runtime,
+ org.junit;version="4.0.0";resolution:=optional,
+ org.osgi.framework,
+ org.slf4j
+Require-Bundle: net.enilink.komma.model,
+ org.openrdf.sesame;bundle-version="[2.0.0,3.0.0)",
+ net.enilink.komma.sesame
+Export-Package: net.enilink.komma.agraph
