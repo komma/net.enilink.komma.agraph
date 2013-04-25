@@ -4,7 +4,7 @@ Bundle-Name: KOMMA Allegrograph provider
 Bundle-SymbolicName: net.enilink.komma.agraph;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: lib/agraph-4.4.jar,
+Bundle-ClassPath: lib/agclient-snapshot.jar,
  lib/commons-pool-1.5.6.jar,
  lib/json.jar,
  .
