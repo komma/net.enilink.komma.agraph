@@ -32,11 +32,14 @@ import net.enilink.komma.model.IModelSet;
 import net.enilink.komma.model.MODELS;
 import net.enilink.komma.model.sesame.RemoteModelSetSupport;
 import net.enilink.komma.core.IBindings;
+import net.enilink.komma.core.IDialect;
 import net.enilink.komma.core.IReference;
 import net.enilink.komma.core.IStatement;
 import net.enilink.komma.core.IValue;
 import net.enilink.komma.core.InferencingCapability;
 import net.enilink.komma.core.KommaException;
+import net.enilink.komma.core.QueryFragment;
+import net.enilink.komma.core.SparqlStandardDialect;
 import net.enilink.komma.core.Statement;
 import net.enilink.komma.core.URIImpl;
 import net.enilink.komma.sesame.SesameDataManagerFactory;
@@ -47,6 +50,42 @@ public abstract class AGraphModelSetSupport extends RemoteModelSetSupport
 		implements IModelSet.Internal {
 	public static final String AGRAPH_USERNAME = "super";
 	public static final String AGRAPH_PASSWORD = "super";
+
+	static class AGraphDialect extends SparqlStandardDialect {
+		@Override
+		public QueryFragment fullTextSearch(
+				Collection<? extends String> bindingNames, int flags,
+				String... patterns) {
+			StringBuilder queryPatterns = new StringBuilder();
+			for (String pattern : patterns) {
+				if (pattern.isEmpty()) {
+					continue;
+				}
+				pattern = pattern.replaceAll("\"", "").replaceAll("\\s+",
+						" and ");
+				if (!pattern.isEmpty()) {
+					if (queryPatterns.length() > 0) {
+						queryPatterns.append((flags & ALL) == 0 ? " | " : " ");
+					}
+					queryPatterns.append("*").append(pattern).append("*");
+				}
+			}
+			StringBuilder sb = new StringBuilder();
+			if (queryPatterns.length() > 0) {
+				for (String bindingName : bindingNames) {
+					if (sb.length() > 0) {
+						sb.append(" union ");
+					}
+					sb.append("{ ")
+							.append("?")
+							.append(bindingName)
+							.append(" <http://franz.com/ns/allegrograph/2.2/textindex/match>")
+							.append(" \"").append(queryPatterns).append("\" }");
+				}
+			}
+			return new QueryFragment(sb.toString());
+		}
+	}
 
 	protected Repository createRepository() throws RepositoryException {
 		String url = valueOrDefault(getServer(),
@@ -73,7 +112,7 @@ public abstract class AGraphModelSetSupport extends RemoteModelSetSupport
 				IDataChangeSupport changeSupport) {
 			super(repository, changeSupport);
 			((AGRepositoryConnection) getConnection()).getHttpRepoClient()
-					.setAllowExternalBlankNodeIds(true);
+					.setAllowExternalBlankNodeIds(false);
 		}
 
 		protected IReference[] addNull(boolean includeInferred,
@@ -155,6 +194,9 @@ public abstract class AGraphModelSetSupport extends RemoteModelSetSupport
 		modules.add(new AbstractModule() {
 			@Override
 			protected void configure() {
+				bind(AGraphDialect.class);
+				bind(IDialect.class).to(AGraphDialect.class);
+
 				bind(InferencingCapability.class).toInstance(
 						new InferencingCapability() {
 							@Override
