@@ -3,7 +3,31 @@ package net.enilink.komma.agraph;
 import java.util.Arrays;
 import java.util.Collection;
 
+import net.enilink.commons.iterator.IExtendedIterator;
+import net.enilink.commons.iterator.IMap;
 import net.enilink.composition.annotations.Iri;
+import net.enilink.komma.core.IBindings;
+import net.enilink.komma.core.IDialect;
+import net.enilink.komma.core.IReference;
+import net.enilink.komma.core.IStatement;
+import net.enilink.komma.core.IValue;
+import net.enilink.komma.core.InferencingCapability;
+import net.enilink.komma.core.KommaException;
+import net.enilink.komma.core.QueryFragment;
+import net.enilink.komma.core.SparqlStandardDialect;
+import net.enilink.komma.core.Statement;
+import net.enilink.komma.core.URIs;
+import net.enilink.komma.dm.IDataManager;
+import net.enilink.komma.dm.IDataManagerFactory;
+import net.enilink.komma.dm.IDataManagerQuery;
+import net.enilink.komma.dm.change.IDataChangeSupport;
+import net.enilink.komma.internal.sesame.SesameRepositoryDataManager;
+import net.enilink.komma.model.IModelSet;
+import net.enilink.komma.model.MODELS;
+import net.enilink.komma.model.sesame.RemoteModelSetSupport;
+import net.enilink.komma.sesame.SesameDataManagerFactory;
+import net.enilink.komma.sesame.SesameModule;
+
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.Query;
 import org.openrdf.repository.Repository;
@@ -20,30 +44,6 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.util.Modules;
-
-import net.enilink.commons.iterator.IExtendedIterator;
-import net.enilink.commons.iterator.IMap;
-import net.enilink.komma.dm.IDataManager;
-import net.enilink.komma.dm.IDataManagerFactory;
-import net.enilink.komma.dm.IDataManagerQuery;
-import net.enilink.komma.dm.change.IDataChangeSupport;
-import net.enilink.komma.internal.sesame.SesameRepositoryDataManager;
-import net.enilink.komma.model.IModelSet;
-import net.enilink.komma.model.MODELS;
-import net.enilink.komma.model.sesame.RemoteModelSetSupport;
-import net.enilink.komma.core.IBindings;
-import net.enilink.komma.core.IDialect;
-import net.enilink.komma.core.IReference;
-import net.enilink.komma.core.IStatement;
-import net.enilink.komma.core.IValue;
-import net.enilink.komma.core.InferencingCapability;
-import net.enilink.komma.core.KommaException;
-import net.enilink.komma.core.QueryFragment;
-import net.enilink.komma.core.SparqlStandardDialect;
-import net.enilink.komma.core.Statement;
-import net.enilink.komma.core.URIImpl;
-import net.enilink.komma.sesame.SesameDataManagerFactory;
-import net.enilink.komma.sesame.SesameModule;
 
 @Iri(MODELS.NAMESPACE + "AGraphModelSet")
 public abstract class AGraphModelSetSupport extends RemoteModelSetSupport
@@ -89,7 +89,7 @@ public abstract class AGraphModelSetSupport extends RemoteModelSetSupport
 
 	protected Repository createRepository() throws RepositoryException {
 		String url = valueOrDefault(getServer(),
-				URIImpl.createURI("http://localhost:10035")).toString();
+				URIs.createURI("http://localhost:10035")).toString();
 		AGServer server = new AGServer(url, valueOrDefault(getUsername(),
 				AGRAPH_USERNAME),
 				valueOrDefault(getPassword(), AGRAPH_PASSWORD));
